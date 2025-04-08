@@ -25,10 +25,12 @@ This script helps you generate an SSH key, configure your SSH client, and add th
    ```
 
    The script will prompt you for the following information:
+
    - Your email address
-   - A name for your SSH key (without spaces)
    - Your GitHub username
    - The repository name
+
+   The SSH key name will be automatically generated based on the repository name.
 
 4. **Add the SSH Key to GitHub**
 
@@ -63,30 +65,16 @@ This script helps you generate an SSH key, configure your SSH client, and add th
 
 ## Ensuring SSH Keys are Loaded Automatically
 
-To ensure your SSH keys are loaded automatically when you start a new session, add the following lines to your `~/.bashrc` file:
+The script will create a helper script called `pvt-ssh-start.sh` in your home directory and will ask if you want to automatically update your `~/.bashrc` file to load your SSH keys at login.
+
+If you choose not to automatically update your `~/.bashrc`, you can manually add these lines:
 
 ```sh
-# Start the ssh-agent
-eval "$(ssh-agent -s)"
-
-# Add all SSH keys
-for key in ~/.ssh/id_* ~/.ssh/*_key; do
-    if [ -f "$key" ] && [ -r "$key" ]; then
-        if [[ "$key" != *.pub ]]; then
-            chmod 600 "$key"
-            ssh-add "$key"
-        fi
-    fi
-done
+# Start SSH agent and load keys
+if [ -f "$HOME/pvt-ssh-start.sh" ]; then
+    "$HOME/pvt-ssh-start.sh"
+fi
 ```
-
-You can add these lines by editing your `~/.bashrc` file:
-
-```sh
-nano ~/.bashrc
-```
-
-Then paste the lines at the end of the file and save it.
 
 After updating your `~/.bashrc` file, apply the changes by running:
 
@@ -94,4 +82,12 @@ After updating your `~/.bashrc` file, apply the changes by running:
 source ~/.bashrc
 ```
 
-This README provides all the necessary instructions for generating and using SSH keys with GitHub, ensuring a smooth setup process.
+## Features of the Setup
+
+- Generates an Ed25519 SSH key (more secure than RSA)
+- Properly configures SSH with the correct permissions
+- Sets up a dedicated Host entry for GitHub to avoid SSH key conflicts
+- Creates a helper script to automatically load keys at login
+- Ensures proper file permissions for security
+
+This setup provides all the necessary components for generating and using SSH keys with GitHub, ensuring a smooth and secure setup process.

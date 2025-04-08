@@ -3,13 +3,11 @@
 # Start the ssh-agent and add keys to it
 eval "$(ssh-agent -s)"
 
-# Iterate over all files in the .ssh directory
+# Add all SSH keys (excluding .pub files)
 for key in ~/.ssh/*; do
-    # Extract the base name of the file
-    filename=$(basename -- "$key")
-    # Check if the file is readable, not a directory, does not have a dot in the filename, and has a corresponding public key file
-    if [[ -f "$key" && -r "$key" && "$filename" != *.* && -f "$key.pub" ]]; then
-        echo "Processing key: $key"
+    # Skip public keys, config file, and other non-key files
+    if [[ -f "$key" && ! "$key" == *.pub && ! "$(basename "$key")" == "config" && ! "$(basename "$key")" == "known_hosts" ]]; then
+        echo "Adding key: $key"
         chmod 600 "$key"
         ssh-add "$key"
     fi
